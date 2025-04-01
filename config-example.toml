@@ -1,0 +1,13 @@
+[Bot]
+botToken = ""
+adminIds = [1234567890, 1234567891]
+
+[database]
+name = "waffle"
+password = "waffle-password"
+url = "localhost"
+port = 27017
+database = "waffleai"
+
+[ai]
+langdockKey = ""
