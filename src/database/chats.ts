@@ -15,12 +15,12 @@ const messageSchema = new Schema<IMessage>({
 });
 
 export interface IChatHistory extends Document {
-  userId: string;
+  userId: number;
   messages: IMessage[];
 }
 
 const chatHistorySchema = new Schema<IChatHistory>({
-  userId: { type: String, required: true },
+  userId: { type: Number, required: true },
   messages: [messageSchema],
 });
 

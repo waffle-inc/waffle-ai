@@ -8,7 +8,7 @@ export class ChatService {
         this.chatHistoryModel = ChatHistory;
     }
     async AddMessage(
-        userId: string,
+        userId: number,
         role: 'user' | 'assistant',
         text: string,
         filePath?: string
@@ -25,7 +25,19 @@ export class ChatService {
         return chat;
     }
 
-    async ClearChat(userId: string): Promise<void> {
+    async ClearChat(userId: number): Promise<void> {
         await this.chatHistoryModel.deleteOne({ userId });
+    }
+
+    async GetChatHistory(userId: number): Promise<{role: string, content: string}[]> {
+        const chat = await this.chatHistoryModel.findOne({ userId });
+        if (!chat) {
+            return [];
+        }
+        
+        return chat.messages.map(msg => ({
+            role: msg.role,
+            content: msg.text
+        }));
     }
 }

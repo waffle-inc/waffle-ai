@@ -1,20 +1,23 @@
 import axios from "axios";
 import config from "../../config.toml";
 
-class ClaudeService {
+export default class ClaudeService {
   private apiKey: string;
 
   constructor() {
     this.apiKey = config.ai.langdockKey;
   }
 
-  async sendMessage(message: string, model: string = "claude-3-5-sonnet-20240620"): Promise<any> {
+  async sendMessage(message: string, history: Array<{role: string, content: string}> = [], model: string = "claude-3-5-sonnet-20240620"): Promise<any> {
     try {
+      // Формируем список сообщений, включая историю
+      const messages = [...history, { role: "user", content: message }];
+      
       const response = await axios.post(
         "https://api.langdock.com/anthropic/eu/v1/messages",
         {
-          max_tokens: 2000,
-          messages: [{ content: message, role: "user" }],
+          max_tokens: 4000,
+          messages: messages,
           model: model
         },
         {
@@ -24,12 +27,22 @@ class ClaudeService {
           }
         }
       );
-      return response.data;
+      
+      let content = response.data.content;
+      
+      if (Array.isArray(content)) {
+        content = content
+          .filter(item => item.type === 'text')
+          .map(item => item.text)
+          .join('\n');
+      }
+      
+      return {
+        content: content
+      };
     } catch (error) {
-      console.error("Ошибка при отправке сообщения:", error);
+      console.error('Error sending message to Claude:', error);
       throw error;
     }
   }
 }
-
-export default ClaudeService;
